@@ -1,7 +1,8 @@
 # shared/security/jwt.py
-import jwt
 from datetime import datetime, timedelta
 from typing import Optional
+
+import jwt
 
 SECRET_KEY = "mysecret"
 ALGORITHM = "HS256"

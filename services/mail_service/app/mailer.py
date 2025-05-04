@@ -1,11 +1,13 @@
 import httpx
+
 from .config import get_settings
+
 
 async def send_email(to: str, subject: str, html: str) -> None:
     settings = get_settings()
     payload = {
         "from": settings.mail_from,
-        "to":   [to],
+        "to": [to],
         "subject": subject,
         "html": html,
     }

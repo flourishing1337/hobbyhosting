@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from shared.security.jwt import create_access_token
@@ -12,13 +12,16 @@ fake_users_db = {
     }
 }
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class UserCreate(BaseModel):
     email: str
     password: str
+
 
 @router.post("/register", response_model=Token)
 def register(user: UserCreate):
@@ -27,6 +30,7 @@ def register(user: UserCreate):
     fake_users_db[user.email] = {"email": user.email, "password": user.password}
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends()):

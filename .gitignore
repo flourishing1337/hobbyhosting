@@ -1,0 +1,34 @@
+# ▶ Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# ▶ Node / Next.js / Yarn / pnpm / npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+.storybook/static/
+dist/
+
+# ▶ Docker artefakter
+**/Dockerfile*
+*.tar
+docker-compose.override.yml
+
+# ▶ Editor / OS skräp
+.idea/
+.vscode/
+.DS_Store
+
+# ▶ Env & secrets
+.env
+.env.*
+auth.token
+
+# ▶ Misc
+coverage/
+*.swp
+*.swo

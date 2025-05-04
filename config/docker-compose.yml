@@ -1,0 +1,124 @@
+# --- docker-compose.yml ---
+version: '3.9'
+
+services:
+
+  # DATABASE
+  database:
+    image: postgres:16-alpine
+    container_name: database_service
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ../services/database_service/init-scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - backend
+
+  # AUTH
+  auth_service:
+    build: ../services/auth_service
+    container_name: auth_service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${AUTH_DB}
+    depends_on:
+      - database
+    expose:
+      - "8000"
+    networks:
+      - backend
+
+  # MAIL
+  mail_service:
+    build: ../services/mail_service
+    container_name: mail_service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${MAIL_DB}
+    depends_on:
+      - database
+    ports:
+      - "5000:5000"
+    networks:
+      - backend
+
+  # ECOMMERCE
+  ecom_backend:
+    build: ../services/ecom/backend
+    container_name: ecom_backend
+    restart: unless-stopped
+    env_file: ../services/ecom/backend/.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${ECOM_DB}
+    depends_on:
+      - database
+    ports:
+      - "8001:8000"
+    networks:
+      - backend
+
+  ecom_frontend:
+    build: ../services/ecom/frontend
+    container_name: ecom_frontend
+    restart: unless-stopped
+    depends_on:
+      - ecom_backend
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
+  # ADMIN FRONTEND
+  admin_frontend:
+    build: ../services/admin_frontend
+    container_name: admin_frontend
+    restart: unless-stopped
+    ports:
+      - "3100:3000"
+    networks:
+      - backend
+
+  # MAIN FRONTEND
+  hobbyhosting_frontend:
+    build: ../apps/hobbyhosting-frontend
+    container_name: hobbyhosting_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
+    networks:
+      - backend
+
+  # CADDY
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../config/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - auth_service
+      - mail_service
+      - ecom_backend
+      - ecom_frontend
+      - hobbyhosting_frontend
+      - admin_frontend
+    networks:
+      - backend
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  backend:

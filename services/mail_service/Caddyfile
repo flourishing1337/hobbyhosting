@@ -1,0 +1,11 @@
+mail.hobbyhosting.org {
+
+  # Reverse proxy for mail service
+  reverse_proxy mail_service:5000
+
+  # Optional: auth service if it exists
+  route /auth* {
+    reverse_proxy auth_service:8000
+  }
+
+}

@@ -1,0 +1,23 @@
+services:
+  auth_service:
+    build: ./auth_service
+    container_name: auth-service
+    env_file: ./.env
+    restart: unless-stopped
+    networks: [backend]
+    expose:
+      - "8000"
+
+networks:
+  backend:
+    external: true
+
+services:
+  auth_service:
+    build: ./auth_service
+    container_name: auth-service
+    env_file: ./auth_service/.env
+    restart: unless-stopped
+    networks: [backend]
+    expose:
+      - "8000"

@@ -1,0 +1,11 @@
+hobbyhosting.org {
+    reverse_proxy hobbyhosting_frontend:3000
+}
+
+auth.hobbyhosting.org {
+    reverse_proxy auth_service:8000
+}
+
+admin.hobbyhosting.org {
+    reverse_proxy admin_frontend:3000
+}

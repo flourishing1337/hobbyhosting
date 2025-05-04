@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+httpx       # lätt klient för Resend-API
+
+email-validator
+pydantic-settings
+python-jose[cryptography]

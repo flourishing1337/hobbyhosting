@@ -152,3 +152,31 @@ clean-all:      ## Docker down + rensa volymer & orphan-cont.
 	tag-release docker-push deploy \
 	run-auth run-admin-fe \
 	clean-all
+	@echo "🔍 Checking Auth...";      curl -sf http://localhost:8000/health           && echo "✅"
+	@echo "🔍 Checking Mail...";      curl -sf http://localhost:5000/health           && echo "✅"
+	@echo "🔍 Checking Ecom API...";  curl -sf http://localhost:8001/health           && echo "✅"
+	@echo "🔍 Checking Frontends…"
+	@curl -sf http://localhost:3100/api/health || true  # admin
+	@curl -sf http://localhost:3000/api/health || true  # ecom
+	@curl -sf http://localhost:8080/api/health || true  # main
+	@echo "🏁  All done"
+
+## 🔍 Pinga alla /health endpoints
+	@echo "Auth:"     && curl -sf http://localhost:8000/health  && echo OK
+	@echo "Mail:"     && curl -sf http://localhost:5000/health  && echo OK
+	@echo "Ecom API:" && curl -sf http://localhost:8001/health  && echo OK
+	@echo "Admin FE:" && curl -sf http://localhost:3100/api/health && echo OK
+	@echo "Ecom FE:"  && curl -sf http://localhost:3000/api/health && echo OK
+	@echo "Main FE:"  && curl -sf http://localhost:8080/api/health && echo OK
+	@echo "🏁 Done"
+
+.PHONY: health-check
+## 🔍 Pinga alla /health endpoints
+health-check:
+	@echo "Auth:"     && curl -sf http://localhost:8000/health  && echo OK
+	@echo "Mail:"     && curl -sf http://localhost:5000/health  && echo OK
+	@echo "Ecom API:" && curl -sf http://localhost:8001/health  && echo OK
+	@echo "Admin FE:" && curl -sf http://localhost:3100/api/health && echo OK
+	@echo "Ecom FE:"  && curl -sf http://localhost:3000/api/health && echo OK
+	@echo "Main FE:"  && curl -sf http://localhost:8080/api/health && echo OK
+	@echo "🏁 Done"

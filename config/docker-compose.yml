@@ -1,119 +1,117 @@
-# --- docker-compose.yml ---
+# config/docker-compose.yml
 version: '3.9'
+
+x-common-attrs: &common
+  restart: unless-stopped
+  networks:
+    - backend
 
 services:
 
-  # DATABASE
+  ### ───── DATABASE ─────
   database:
+    <<: *common
     image: postgres:16-alpine
     container_name: database_service
-    restart: unless-stopped
-    env_file: .env
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+    env_file: .env.${COMPOSE_PROFILE:-dev}
     volumes:
       - db_data:/var/lib/postgresql/data
       - ../services/database_service/init-scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-    networks:
-      - backend
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
 
-  # AUTH
+  ### ───── AUTH SERVICE ─────
   auth_service:
+    <<: *common
     build: ../services/auth_service
     container_name: auth_service
-    restart: unless-stopped
-    env_file: .env
+    env_file: .env.${COMPOSE_PROFILE:-dev}
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${AUTH_DB}
     depends_on:
       - database
     expose:
       - "8000"
-    networks:
-      - backend
 
-  # MAIL
+  ### ───── MAIL SERVICE ─────
   mail_service:
+    <<: *common
     build: ../services/mail_service
     container_name: mail_service
-    restart: unless-stopped
-    env_file: .env
+    env_file: .env.${COMPOSE_PROFILE:-dev}
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${MAIL_DB}
     depends_on:
       - database
     ports:
       - "5000:5000"
-    networks:
-      - backend
 
-  # ECOMMERCE
+  ### ───── ECOM BACKEND ─────
   ecom_backend:
-    build: ../services/ecom/backend
+    <<: *common
+    build:
+      context: ../services/ecom/backend
     container_name: ecom_backend
-    restart: unless-stopped
-    env_file: ../services/ecom/backend/.env
+    env_file: ../services/ecom/backend/.env.${COMPOSE_PROFILE:-dev}
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${ECOM_DB}
     depends_on:
       - database
     ports:
       - "8001:8000"
-    networks:
-      - backend
 
+  ### ───── ECOM FRONTEND ─────
   ecom_frontend:
-    build: ../services/ecom/frontend
+    <<: *common
+    build:
+      context: ../services/ecom/frontend
     container_name: ecom_frontend
-    restart: unless-stopped
     depends_on:
       - ecom_backend
     ports:
       - "3000:3000"
-    networks:
-      - backend
 
-  # ADMIN FRONTEND
+  ### ───── ADMIN FRONTEND ─────
   admin_frontend:
-    build: ../services/admin_frontend
+    <<: *common
+    build:
+      context: ../services/admin_frontend
     container_name: admin_frontend
-    restart: unless-stopped
+    depends_on:
+      - auth_service
     ports:
       - "3100:3000"
-    networks:
-      - backend
 
-  # MAIN FRONTEND
+  ### ───── MAIN FRONTEND ─────
   hobbyhosting_frontend:
-    build: ../apps/hobbyhosting-frontend
+    <<: *common
+    build:
+      context: ../apps/hobbyhosting-frontend
     container_name: hobbyhosting_frontend
-    restart: unless-stopped
+    depends_on:
+      - auth_service
     ports:
       - "8080:3000"
-    networks:
-      - backend
 
-  # CADDY
+  ### ───── CADDY ─────
   caddy:
+    <<: *common
     image: caddy:2-alpine
     container_name: caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ../config/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
     depends_on:
       - auth_service
       - mail_service
       - ecom_backend
       - ecom_frontend
-      - hobbyhosting_frontend
       - admin_frontend
-    networks:
-      - backend
+      - hobbyhosting_frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
 
 volumes:
   db_data:
@@ -122,3 +120,4 @@ volumes:
 
 networks:
   backend:
+    driver: bridge

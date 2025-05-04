@@ -1,200 +1,163 @@
-# ────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────────────────
 # HobbyHosting ▸ Makefile
-# One command-line to rule them all
-# ────────────────────────────────────────────────────────────
+# Ett enda gränssnitt för att styra hela stacken – dev, prod, CI/CD, QA osv.
+# ────────────────────────────────────────────────────────────────────────────
 
-COMPOSE_FILE          = ./config/docker-compose.yml
-DOCKER_COMPOSE        = docker compose -f $(COMPOSE_FILE)
-DOCKER_BUILD_FLAGS    = --no-cache
-DOCKER_DEFAULT_PROFILE?=dev                                # ändra till "prod" i t.ex. CI
+# ─── Konfiguration ───────────────────────────────────────────────────────────
+COMPOSE_FILE       := config/docker-compose.yml
+COMPOSE_PROFILE    ?= dev                      # dev/prod – exportera i CI, t.ex. PROD_PROFILE=prod
+DOCKER_COMPOSE     := docker compose -f $(COMPOSE_FILE)
+DOCKER_BUILD_FLAGS := --no-cache
 
-# --- Make prints vars bara om man kör: make VARS=1
+# Visa variabler om man vill debugga
 ifdef VARS
-$(info COMPOSE_FILE:      $(COMPOSE_FILE))
-$(info DOCKER_COMPOSE:    $(DOCKER_COMPOSE))
+$(info COMPOSE_FILE:    $(COMPOSE_FILE))
+$(info COMPOSE_PROFILE: $(COMPOSE_PROFILE))
+$(info DC:              $(DOCKER_COMPOSE) --profile $(COMPOSE_PROFILE))
 endif
 
-# ────────────────────────────────────────────────────────────
-# HELP (typ  `make`  eller  `make help`)
-# ────────────────────────────────────────────────────────────
+# ─── Standardmål ─────────────────────────────────────────────────────────────
 .DEFAULT_GOAL := help
 
-help:
-	@grep -E '^[a-zA-Z0-9_\-]+:.*?## .*$$' \
-		$(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; \
-		{printf "\033[36m%-24s\033[0m %s\n", $$1, $$2}'
+.PHONY: help up down restart rebuild ps logs clean-all \
+        restart-% logs-% rebuild-% \
+        health-all health-auth health-mail health-ecom-backend health-ecom-frontend health-admin-frontend health-main-frontend \
+        lint format test coverage-report \
+        migrate seed-db backup-db \
+        tag-release docker-push deploy \
+        run-auth run-admin-fe run-ecom-fe \
+        clean-all
 
-# ────────────────────────────────────────────────────────────
-# DOCKER COMPOSE – CORE
-# ────────────────────────────────────────────────────────────
-up:             ## Starta alla tjänster i bakgrunden
-	$(DOCKER_COMPOSE) --profile $(DOCKER_DEFAULT_PROFILE) up -d
+# ─── Hjälp ────────────────────────────────────────────────────────────────────
+help:                                   ## Visa denna hjälp
+	@grep -E '^[a-zA-Z0-9_\-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
-down:           ## Stoppa & ta ned alla kontainrar
+# ─── Docker Compose – Core ────────────────────────────────────────────────────
+up:                                     ## Starta alla tjänster (profil=$(COMPOSE_PROFILE))
+	$(DOCKER_COMPOSE) --profile $(COMPOSE_PROFILE) up -d
+
+down:                                   ## Stoppa & ta ned alla containers
 	$(DOCKER_COMPOSE) down
 
-restart:        ## Snabb-omstart av alla kontainrar
-	$(MAKE) down && $(MAKE) up
+restart:                                ## Down + Up (snabb omstart)
+	$(MAKE) down
+	$(MAKE) up
 
-rebuild:        ## Bygg om allt (ingen cache) + starta
+rebuild:                                ## Bygg om allt utan cache + starta
 	$(DOCKER_COMPOSE) build $(DOCKER_BUILD_FLAGS)
-	$(DOCKER_COMPOSE) up -d
+	$(MAKE) up
 
-ps:             ## Lista kontainrar
+ps:                                     ## Lista containers
 	$(DOCKER_COMPOSE) ps
 
-logs:           ## Följ loggar
-	$(DOCKER_COMPOSE) logs -f --tail=100
+logs:                                   ## Följ alla loggar (senaste 100 rader)
+	$(DOCKER_COMPOSE) logs -f --tail 100
 
-# ────────────────────────────────────────────────────────────
-# DOCKER COMPOSE – PER-TJÄNST
-# ────────────────────────────────────────────────────────────
-restart-%:      ## make restart-SERVICE   »  omstart av tjänst
+# ─── Docker Compose – per tjänst ─────────────────────────────────────────────
+restart-%:                              ## Omstart av enstaka tjänst: make restart-auth_service
 	$(DOCKER_COMPOSE) restart $*
 
-logs-%:         ## make logs-SERVICE      »  loggar för tjänst
+logs-%:                                 ## Loggar för enstaka tjänst: make logs-auth_service
 	$(DOCKER_COMPOSE) logs -f $*
 
-rebuild-%:      ## make rebuild-SERVICE   »  bygg + start enstaka
+rebuild-%:                              ## Bygg + start enstaka tjänst: make rebuild-auth_service
 	$(DOCKER_COMPOSE) build $(DOCKER_BUILD_FLAGS) $*
 	$(DOCKER_COMPOSE) up -d $*
 
-# ────────────────────────────────────────────────────────────
-# HEALTHCHECK SHORTCUTS
-# ────────────────────────────────────────────────────────────
-health-auth:    ## Snabb hälsokoll Auth
-	curl -sf http://localhost:8000/health | jq . || echo "❌ Auth FAILED"
+# ─── Healthchecks ─────────────────────────────────────────────────────────────
+health-auth:                           ## /health Auth service
+	@curl -sf http://localhost:8000/health | jq . || echo "❌ auth_service"
 
-health-mail:    ## Snabb hälsokoll Mail
-	curl -sf http://localhost:5000/health | jq . || echo "❌ Mail FAILED"
+health-mail:                           ## /health Mail service
+	@curl -sf http://localhost:5000/health | jq . || echo "❌ mail_service"
 
-health-ecom:    ## Snabb hälsokoll E-commerce backend
-	curl -sf http://localhost:8001/health | jq . || echo "❌ Ecom FAILED"
+health-ecom-backend:                   ## /health Ecom API
+	@curl -sf http://localhost:8001/health | jq . || echo "❌ ecom_backend"
 
-# ────────────────────────────────────────────────────────────
-# QUALITY (lokala verktyg – inga kontainrar behövs)
-# ────────────────────────────────────────────────────────────
-lint:           ## ESLint + Ruff + Prettier check
-	@echo "🔍  Linting JS/TS…"; \
-		npx eslint apps/**/src services/**/src --max-warnings 0
-	@echo "🔍  Linting Python…"; \
-		ruff check services
-	@echo "✅  Lint OK"
+health-ecom-frontend:                  ## /api/health Ecom frontend
+	@curl -sf http://localhost:3000/api/health | jq . || echo "❌ ecom_frontend"
 
-format:         ## Formatera kod (Prettier + Ruff + isort)
+health-admin-frontend:                 ## /api/health Admin frontend
+	@curl -sf http://localhost:3100/api/health | jq . || echo "❌ admin_frontend"
+
+health-main-frontend:                  ## /api/health Main frontend
+	@curl -sf http://localhost:8080/api/health | jq . || echo "❌ hobbyhosting_frontend"
+
+health-all:                            ## Kör alla health-checks
+	@echo "🔍 Checking all /health endpoints..."
+	@$(MAKE) health-auth
+	@$(MAKE) health-mail
+	@$(MAKE) health-ecom-backend
+	@$(MAKE) health-ecom-frontend
+	@$(MAKE) health-admin-frontend
+	@$(MAKE) health-main-frontend
+
+# ─── Kodkvalitet & tester ────────────────────────────────────────────────────
+lint:                                  ## ESLint + Ruff
+	@echo "🔍 Linting JS/TS…"
+	@npx eslint apps/**/src services/**/src --max-warnings 0
+	@echo "🔍 Linting Python…"
+	@ruff check services
+	@echo "✅ Lint OK"
+
+format:                                ## Prettier + Ruff + isort
+	@echo "🔧 Formatting JS/TS…"
 	@prettier -w "**/*.{js,jsx,ts,tsx,json,md,html,css}"
+	@echo "🔧 Formatting Python…"
 	@ruff format services
 	@ruff check --fix services
 	@isort services
 
-test:           ## Kör alla tester (PyTest + Jest)
+test:                                  ## PyTest + Jest
+	@echo "🧪 Running Python tests…"
 	@pytest -q
+	@echo "🧪 Running JS tests…"
 	@npx jest --coverage
 
-coverage-report: ## Öppna HTML-testrapport lokalt
+coverage-report:                       ## Öppna Python HTML-coveragerapport
 	@python -m webbrowser -t htmlcov/index.html || true
 
-# ────────────────────────────────────────────────────────────
-# DATABASE UTILITIES
-# ────────────────────────────────────────────────────────────
-migrate:        ## Alembic migration (Auth, Mail, Ecom)
+# ─── Databasverktyg ─────────────────────────────────────────────────────────
+migrate:                              ## Alembic migrations (alla services)
 	@alembic -c services/auth_service/alembic.ini upgrade head
 	@alembic -c services/mail_service/alembic.ini upgrade head
 	@alembic -c services/ecom/backend/alembic.ini upgrade head
 
-seed-db:        ## Fyll databasen med startdata
+seed-db:                              ## Initiera databas med seed-data
 	@python services/database_service/init-scripts/seed.py
 
-backup-db:      ## PGa_dump till ./backups/…
+backup-db:                            ## pg_dump → backups/
 	@mkdir -p backups
-	@docker exec database_service pg_dump -U $$POSTGRES_USER -Fc $$POSTGRES_DB \
-		> backups/backup_$$(date +%F_%H-%M-%S).dump
-	@echo "🗄️  Backup klar."
+	@docker exec -i database_service pg_dump -U $$POSTGRES_USER -Fc $$POSTGRES_DB \
+		> backups/backup_$$(date +%F_%H-%M-%S).dump && echo "🗄️ Backup klar"
 
-# ────────────────────────────────────────────────────────────
-# DEPLOY & RELEASE (exempel – justera till er CI/CD)
-# ────────────────────────────────────────────────────────────
-tag-release:    ## Skapa git-tag + changelog (semver)
+# ─── CI/CD & Release ────────────────────────────────────────────────────────
+tag-release:                          ## Skapa git-tag + changelog (skript)
 	@bash scripts/release.sh
 
-docker-push:    ## Bygg & pusha images till registry
+docker-push:                          ## Bygg & pusha docker-images
 	@bash scripts/docker_push.sh
 
-deploy:         ## Gör clean, rebuild & visa status
-	$(MAKE) down
-	$(MAKE) rebuild
-	$(MAKE) ps
+deploy:                               ## Down + rebuild + ps
+	@$(MAKE) down
+	@$(MAKE) rebuild
+	@$(MAKE) ps
 
-# ────────────────────────────────────────────────────────────
-# LOCAL DEV SHORTCUTS (om man absolut måste köra lokalt)
-# ────────────────────────────────────────────────────────────
-run-auth:       ## Uvicorn Auth med hot-reload (host:8000)
-	PYTHONPATH=$$(realpath services) uvicorn auth_service.main:app \
-		--reload --host 0.0.0.0 --port 8000
+# ─── Lokal utveckling (kan tas bort i CI) ────────────────────────────────────
+run-auth:                             ## Uvicorn Auth med hot-reload (port 8000)
+	@PYTHONPATH=$$(realpath services) \
+	  uvicorn auth_service.main:app --reload --host 0.0.0.0 --port 8000
 
-run-admin-fe:   ## Yarn dev för Admin-frontend (host:3100)
-	cd services/admin_frontend && yarn dev --port 3100
+run-admin-fe:                         ## Admin frontend med yarn dev (port 3100)
+	@cd services/admin_frontend && yarn dev --port 3100
 
-# ────────────────────────────────────────────────────────────
-# HOUSEKEEPING
-# ────────────────────────────────────────────────────────────
-clean-all:      ## Docker down + rensa volymer & orphan-cont.
-	$(DOCKER_COMPOSE) down -v --remove-orphans
-	docker volume prune -f
-	docker image prune -f
-	docker container prune -f
+run-ecom-fe:                          ## Ecom frontend med yarn dev (port 3000)
+	@cd services/ecom/frontend && yarn dev --port 3000
 
-.PHONY: help up down restart rebuild ps logs \
-	restart-% logs-% rebuild-% \
-	health-auth health-mail health-ecom \
-	lint format test coverage-report \
-	migrate seed-db backup-db \
-	tag-release docker-push deploy \
-	run-auth run-admin-fe \
-	clean-all
-	@echo "🔍 Checking Auth...";      curl -sf http://localhost:8000/health           && echo "✅"
-	@echo "🔍 Checking Mail...";      curl -sf http://localhost:5000/health           && echo "✅"
-	@echo "🔍 Checking Ecom API...";  curl -sf http://localhost:8001/health           && echo "✅"
-	@echo "🔍 Checking Frontends…"
-	@curl -sf http://localhost:3100/api/health || true  # admin
-	@curl -sf http://localhost:3000/api/health || true  # ecom
-	@curl -sf http://localhost:8080/api/health || true  # main
-	@echo "🏁  All done"
-
-## 🔍 Pinga alla /health endpoints
-	@echo "Auth:"     && curl -sf http://localhost:8000/health  && echo OK
-	@echo "Mail:"     && curl -sf http://localhost:5000/health  && echo OK
-	@echo "Ecom API:" && curl -sf http://localhost:8001/health  && echo OK
-	@echo "Admin FE:" && curl -sf http://localhost:3100/api/health && echo OK
-	@echo "Ecom FE:"  && curl -sf http://localhost:3000/api/health && echo OK
-	@echo "Main FE:"  && curl -sf http://localhost:8080/api/health && echo OK
-	@echo "🏁 Done"
-
-## 🔍 Pinga alla /health endpoints
-	@echo "Auth:"     && curl -sf http://localhost:8000/health  && echo OK
-	@echo "Mail:"     && curl -sf http://localhost:5000/health  && echo OK
-	@echo "Ecom API:" && curl -sf http://localhost:8001/health  && echo OK
-	@echo "Admin FE:" && curl -sf http://localhost:3100/api/health && echo OK
-	@echo "Ecom FE:"  && curl -sf http://localhost:3000/api/health && echo OK
-	@echo "Main FE:"  && curl -sf http://localhost:8080/api/health && echo OK
-	@echo "🏁 Done"
-
-## 🔍 Pinga alla /health endpoints
-	@echo "Auth:"     && curl -sf http://localhost:8000/health  && echo OK
-	@echo "Mail:"     && curl -sf http://localhost:5000/health  && echo OK
-	@echo "Ecom API:" && curl -sf http://localhost:8001/health  && echo OK
-	@echo "Admin FE:" && curl -sf http://localhost:3100/api/health && echo OK
-	@echo "Ecom FE:"  && curl -sf http://localhost:3000/api/health && echo OK
-	@echo "Main FE:"  && curl -sf http://localhost:8080/api/health && echo OK
-	@echo "🏁 Done"
-
-.PHONY: health-check
-## 🔍 Pinga alla /health endpoints
-health-check:
-	@echo "Auth:"     && curl -sf http://localhost:8000/health  && echo OK
-	@echo "Mail:"     && curl -sf http://localhost:5000/health  && echo OK
-	@echo "Ecom API:" && curl -sf http://localhost:8001/health  && echo OK
-	@echo "Admin FE:" && curl -sf http://localhost:3100/api/health && echo OK
-	@echo "Ecom FE:"  && curl -sf http://localhost:3000/api/health && echo OK
-	@echo "Main FE:"  && curl -sf http://localhost:8080/api/health && echo OK
-	@echo "🏁 Done"
+# ─── Housekeeping ───────────────────────────────────────────────────────────
+clean-all:                            ## Rensa containers, volymer, images, cache
+	@$(MAKE) down
+	@docker volume prune -f
+	@docker container prune -f
+	@docker image prune -f

@@ -1,11 +1,33 @@
+{
+  # Global inställningar
+  auto_https on
+  on_demand_tls {
+    interval 2h
+    burst    5
+  }
+}
+
 hobbyhosting.org {
-    reverse_proxy hobbyhosting_frontend:3000
+  reverse_proxy hobbyhosting_frontend:3000
 }
 
 auth.hobbyhosting.org {
-    reverse_proxy auth_service:8000
+  reverse_proxy auth_service:8000
+}
+
+mail.hobbyhosting.org {
+  reverse_proxy mail_service:5000
+}
+
+ecom.hobbyhosting.org {
+  reverse_proxy ecom_frontend:3000
 }
 
 admin.hobbyhosting.org {
-    reverse_proxy admin_frontend:3000
+  reverse_proxy admin_frontend:3000
+}
+
+# Health-check för Caddy själv
+:2019 {
+  respond "/favicon.ico" 204
 }

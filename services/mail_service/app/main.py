@@ -16,7 +16,8 @@ def health():
 
 @app.post("/send", status_code=HTTP_202_ACCEPTED)
 async def send(
-    req: MailRequest, current_user=Depends(get_current_user)  # ⬅️ kräver JWT
+    req: MailRequest,
+    current_user=Depends(get_current_user),  # ⬅️ kräver JWT
 ):
     try:
         await send_email(req.to, req.subject, req.html)

@@ -75,8 +75,8 @@ rebuild-%:               ## Rebuild enskild tjänst
 
 # ─── Healthchecks ──────────────────────────────────────────────
 
-health-auth:             ## /health Auth
-	@curl -sf http://localhost:8000/health | jq . || echo "❌ auth_service"
+health-auth:             ## /auth/health internt via frontend-container
+	docker exec -i hobbyhosting_frontend wget -qO- http://auth_service:8000/auth/health || echo "❌ auth_service"
 
 health-mail:
 	@curl -sf http://localhost:5000/health | jq . || echo "❌ mail_service"

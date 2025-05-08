@@ -18,3 +18,16 @@ mail.hobbyhosting.org {
 auth.hobbyhosting.org {
   reverse_proxy auth_service:8000
 }
+
+ecom.hobbyhosting.org {
+  # Route API requests to the backend
+  handle_path /api/* {
+    uri strip_prefix /api
+    reverse_proxy ecom_backend:8000
+  }
+
+  # Route all other requests to the frontend
+  handle {
+    reverse_proxy ecom_frontend:3000
+  }
+}

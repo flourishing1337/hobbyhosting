@@ -8,8 +8,10 @@ Ett modernt DevOps-baserat plattformsprojekt byggt med microservices, Docker, Fa
 
 ```
 hobbyhosting/
-├── apps/                  # Fristående appar (frontend/adminjs etc)
-│   └── hobbyhosting-frontend/
+├── apps/                  # Fristående frontends
+│   ├── public_site/       # Enkel statisk sida
+│   ├── admin_panel/       # Minimal adminpanel
+│   └── hobbyhosting-frontend/  # Legacy Next.js-projekt (tomt)
 ├── packages/
 │   └── ui/                # Återanvändbara React-komponenter
 ├── services/              # Backend-tjänster
@@ -91,6 +93,21 @@ npm run build
 Dessa komponenter kan sedan importeras i admin-frontenden för en enhetlig
 design.
 
+Frontend-apparna ligger under `apps/` och består av rena statiska filer:
+
+- `public_site/` – enkel publiksida
+- `admin_panel/` – lättviktigt admin-gränssnitt
+
+Starta dem genom att öppna `index.html` direkt eller kör en simpel HTTP-server:
+
+```bash
+cd apps/public_site
+python3 -m http.server
+```
+
+Surfa sedan till `http://localhost:8000` och API:et fungerar som vanligt via
+Docker Compose.
+
 ---
 
 ## 🧪 Tester
@@ -167,7 +184,6 @@ registrering.
 
 ## 🛠 TODO (för vidare utveckling)
 
-- Rensa upp gammal kod i hobbyhosting-frontend
 - Lägga till CI/CD
 - Integrera mailutskick
 - Lägg till docs för hur auth fungerar

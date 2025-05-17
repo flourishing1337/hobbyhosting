@@ -4,8 +4,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
 
-SECRET_KEY = "supersecret"
-ALGORITHM = "HS256"
+from .config import get_settings
+
+settings = get_settings()
+
+SECRET_KEY = settings.JWT_SECRET
+ALGORITHM = settings.JWT_ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 security = HTTPBearer()

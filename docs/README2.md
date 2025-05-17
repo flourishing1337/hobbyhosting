@@ -95,6 +95,17 @@ Det använder `pytest` för Python och `jest` för JavaScript.
 
 ---
 
+## Auth Service API
+
+- `POST /auth/login` – logga in och få JWT-token
+- `POST /auth/refresh` – byt ut ett giltigt token mot ett nytt
+- `GET /auth/me` – hämta aktuell användare (kräver `Authorization` header)
+- `POST /auth/register` – skapa ny användare
+
+Alla svar innehåller ett `access_token` som skickas som `Bearer`-token i `Authorization`-headern.
+
+---
+
 ## 🛠 TODO (för vidare utveckling)
 
 - Rensa upp gammal kod i hobbyhosting-frontend

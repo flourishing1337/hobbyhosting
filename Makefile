@@ -106,17 +106,25 @@ health-all:              ## Kör alla health endpoints
 # ─── Kodkvalitet ───────────────────────────────────────────────
 
 lint:                    ## ESLint + Ruff
-	npx eslint apps/**/src services/**/src --max-warnings 0
+	@if ls apps/*/src services/*/src >/dev/null 2>&1; then \
+	npx eslint apps/**/src services/**/src --max-warnings 0; \
+	else \
+	echo "No JS/TS sources, skipping ESLint"; \
+	fi
 	ruff check services
 
 format:                  ## Prettier + Ruff + isort
 	prettier -w "**/*.{js,jsx,ts,tsx,json,md,html,css}"
 	ruff format services && ruff check --fix services
 	isort services
-
+		
 test:                    ## Pytest + Jest
 	pytest -q
-	npx jest --coverage
+	@if [ -f package.json ]; then \
+	npx jest --coverage; \
+else \
+echo "No package.json found, skipping Jest"; \
+fi
 
 coverage-report:         ## Visa HTML-rapport för coverage
 	python -m webbrowser -t htmlcov/index.html || true

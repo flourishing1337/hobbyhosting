@@ -82,6 +82,13 @@ Kör alla enhetstester och frontendtester med:
 make test
 ```
 
+In a fresh environment install the development dependencies first:
+
+```bash
+pip install -r requirements-dev.txt
+npm install
+```
+
 Det använder `pytest` för Python och `jest` för JavaScript.
 
 ---

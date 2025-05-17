@@ -1,0 +1,8 @@
+{
+  "name": "hobbyhosting",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0"
+  }
+}

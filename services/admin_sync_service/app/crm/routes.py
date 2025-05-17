@@ -1,10 +1,11 @@
 from typing import List
 
-from admin_sync_service.app.crm import models, schemas
-# 📁 apps/admin_sync_service/app/crm/routes.py
-from admin_sync_service.app.dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
+# 📁 apps/admin_sync_service/app/crm/routes.py
+from ..dependencies import get_db
+from . import models, schemas
 
 router = APIRouter(prefix="/crm", tags=["CRM"])
 

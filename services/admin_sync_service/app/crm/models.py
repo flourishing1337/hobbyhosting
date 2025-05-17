@@ -1,6 +1,7 @@
-from admin_sync_service.app.dependencies import Base
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
+
+from ..dependencies import Base
 
 
 class Company(Base):

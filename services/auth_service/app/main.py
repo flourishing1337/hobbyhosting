@@ -39,17 +39,37 @@ app.add_middleware(
 
 
 @app.get("/auth/health")
-def health():
+def health() -> dict:
+    return {"status": "ok"}
+
+
+@app.get("/health")
+def root_health() -> dict:
+    """Backward compatible health check at the root path."""
     return {"status": "ok"}
 
 
 @app.post("/auth/login", response_model=TokenOut)
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
+async def login(request: Request, db: Session = Depends(get_db)):
+    """Authenticate a user and return a JWT token.
+
+    Supports both ``application/x-www-form-urlencoded`` and ``application/json``
+    payloads so that the endpoint works with standard OAuth2 forms as well as
+    fetch requests sending JSON.
+    """
     try:
-        username = form_data.username
-        password = form_data.password
+        username = None
+        password = None
+
+        content_type = request.headers.get("content-type", "")
+        if "application/json" in content_type:
+            body = await request.json()
+            username = body.get("username")
+            password = body.get("password")
+        else:
+            form = await request.form()
+            username = form.get("username")
+            password = form.get("password")
 
         logger.info(f"Login attempt for user: {username}")
 

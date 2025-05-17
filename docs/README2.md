@@ -15,7 +15,7 @@ hobbyhosting/
 ├── services/              # Backend-tjänster
 │   ├── auth_service/
 │   ├── mail_service/
-│   ├── ecom/
+│   ├── ecommerce/
 │   ├── database_service/
 │   └── shared/            # Delad kod mellan tjänster
 ├── config/                # DevOps, Caddy, docker-compose

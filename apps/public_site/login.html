@@ -2,22 +2,33 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Login</title>
+    <title>Login - HobbyHosting</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Login</h1>
-    <form id="login-form">
-      <label>
-        Username:
-        <input type="text" id="username" required /> </label
-      ><br />
-      <label>
-        Password:
-        <input type="password" id="password" required /> </label
-      ><br />
-      <button type="submit">Login</button>
-    </form>
-    <p id="message"></p>
+    <header>
+      <h1>HobbyHosting</h1>
+      <nav>
+        <a href="register.html">Create an account</a>
+      </nav>
+    </header>
+    <main class="container">
+      <h2>Login</h2>
+      <form id="login-form">
+        <label
+          >Username:<br /><input type="text" id="username" required
+        /></label>
+        <label
+          >Password:<br /><input type="password" id="password" required
+        /></label>
+        <button type="submit">Login</button>
+      </form>
+      <p id="message"></p>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="register.html">Register</a>
+      </nav>
+    </main>
     <script src="login.js"></script>
   </body>
 </html>

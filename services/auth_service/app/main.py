@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from .dependencies import engine, get_db
@@ -61,15 +61,17 @@ async def login(request: Request, db: Session = Depends(get_db)):
         username = None
         password = None
 
-        content_type = request.headers.get("content-type", "")
-        if "application/json" in content_type:
-            body = await request.json()
-            username = body.get("username")
-            password = body.get("password")
-        else:
-            form = await request.form()
-            username = form.get("username")
-            password = form.get("password")
+        form = await request.form()
+        username = form.get("username")
+        password = form.get("password")
+
+        if not username or not password:
+            try:
+                body = await request.json()
+            except Exception:
+                body = {}
+            username = username or body.get("username")
+            password = password or body.get("password")
 
         logger.info(f"Login attempt for user: {username}")
 
@@ -115,7 +117,10 @@ async def refresh(request: Request):
 
 
 @app.get("/auth/me", response_model=UserOut)
-def read_me(auth: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+def read_me(
+    auth: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db),
+):
     payload = verify_token(auth.credentials)
     username = payload["sub"]
     user = db.query(User).filter(User.username == username).first()

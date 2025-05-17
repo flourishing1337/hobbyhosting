@@ -10,6 +10,8 @@ Ett modernt DevOps-baserat plattformsprojekt byggt med microservices, Docker, Fa
 hobbyhosting/
 ├── apps/                  # Fristående appar (frontend/adminjs etc)
 │   └── hobbyhosting-frontend/
+├── packages/
+│   └── ui/                # Återanvändbara React-komponenter
 ├── services/              # Backend-tjänster
 │   ├── auth_service/
 │   ├── mail_service/
@@ -71,6 +73,38 @@ Exempel finns i `.env.example`.
 - Allt byggs och körs genom `config/docker-compose.yml`
 - Caddy hanterar HTTPS + domäner automatiskt
 - Alla tjänster körs via interna nätverk (`backend`)
+
+---
+
+## 🎨 Frontend & UI
+
+Det finns ett separat paket `packages/ui` som innehåller återanvändbara
+React-komponenter. Installera beroenden och bygg paketet via:
+
+```bash
+cd packages/ui
+npm install
+npm run build
+```
+
+Dessa komponenter kan sedan importeras i admin-frontenden för en enhetlig
+design.
+
+Exempel på komponenter som finns i dagsläget:
+
+- `Button`
+- `Card`
+- `Navbar`
+
+### Starta admin-dashboard lokalt
+
+```bash
+cd apps/hobbyhosting-frontend
+npm install
+npm run dev
+```
+
+Applikationen körs då på http://localhost:8080 via Caddy.
 
 ---
 
@@ -138,10 +172,12 @@ vanligtvis en 404- eller proxy-felkod.
 
 ## 🛠 TODO (för vidare utveckling)
 
+- Skapa Next.js-admin-dashboard under `apps/hobbyhosting-frontend`
 - Rensa upp gammal kod i hobbyhosting-frontend
 - Lägga till CI/CD
 - Integrera mailutskick
 - Lägg till docs för hur auth fungerar
+- Bygg vidare på `packages/ui` för delad design
 
 ---
 

@@ -1,11 +1,11 @@
 from typing import List
 
+from admin_sync_service.app.crm import models, schemas
+
 # 📁 apps/admin_sync_service/app/crm/routes.py
-from app.dependencies import get_db
+from admin_sync_service.app.dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
-from . import models, schemas
 
 router = APIRouter(prefix="/crm", tags=["CRM"])
 
@@ -43,7 +43,9 @@ def get_company(company_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/companies/{company_id}/todos", response_model=schemas.ToDoOut)
-def create_todo(company_id: int, todo: schemas.ToDoCreate, db: Session = Depends(get_db)):
+def create_todo(
+    company_id: int, todo: schemas.ToDoCreate, db: Session = Depends(get_db)
+):
     company = db.query(models.Company).filter(models.Company.id == company_id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.dependencies import Base
+from admin_sync_service.app.dependencies import Base
 from sqlalchemy import Column, DateTime, Integer, String
 
 

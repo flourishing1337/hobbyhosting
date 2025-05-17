@@ -1,10 +1,12 @@
 # 📁 apps/admin_sync_service/app/main.py
 from datetime import datetime, timedelta
 
-from app.crm.routes import router as crm_router
-from app.dependencies import Base, engine, get_db
-from app.sync.models import Sync
-from app.sync.schemas import SyncCreate  # Flytta gärna till app/sync/schemas.py
+from admin_sync_service.app.crm.routes import router as crm_router
+from admin_sync_service.app.dependencies import Base, engine, get_db
+from admin_sync_service.app.sync.models import Sync
+from admin_sync_service.app.sync.schemas import (  # Flytta gärna till app/sync/schemas.py
+    SyncCreate,
+)
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse

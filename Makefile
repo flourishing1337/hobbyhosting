@@ -119,7 +119,7 @@ format:                  ## Prettier + Ruff + isort
 	isort services
 		
 test:                    ## Pytest + Jest
-	pytest -q
+	PYTHONPATH=$$PYTHONPATH:$$(pwd)/services python3 -m pytest -q
 	@if [ -f package.json ]; then \
 	npx jest --coverage; \
 else \

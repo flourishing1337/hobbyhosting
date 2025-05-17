@@ -16,7 +16,11 @@ def test_register_json_returns_id_and_message():
     username = f"user_{uuid.uuid4().hex}"
     resp = client.post(
         "/auth/register",
-        json={"username": username, "password": "test-pass"},
+        json={
+            "username": username,
+            "email": username + "@example.com",
+            "password": "test-pass",
+        },
     )
     assert resp.status_code == 201
     data = resp.json()
@@ -30,15 +34,18 @@ def test_login_json_returns_access_token():
     # Register user first
     reg_resp = client.post(
         "/auth/register",
-        json={"username": username, "password": password},
+        json={
+            "username": username,
+            "email": username + "@example.com",
+            "password": password,
+        },
     )
     assert reg_resp.status_code == 201
 
     login_resp = client.post(
         "/auth/login",
-        json={"username": username, "password": password},
+        data={"username": username, "password": password},
     )
     assert login_resp.status_code == 200
     data = login_resp.json()
     assert "access_token" in data and data["access_token"]
-

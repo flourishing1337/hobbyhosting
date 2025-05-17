@@ -11,6 +11,7 @@ from auth_service.app.main import app
 
 client = TestClient(app)
 
+
 def test_auth_health():
     response = client.get("/auth/health")
     assert response.status_code == 200
@@ -25,14 +26,18 @@ def test_login_returns_access_token():
     # Create user first
     reg_resp = client.post(
         "/auth/register",
-        json={"username": username, "password": password},
+        json={
+            "username": username,
+            "email": username + "@example.com",
+            "password": password,
+        },
     )
     assert reg_resp.status_code == 201
 
     # Now log in with the same credentials
     login_resp = client.post(
         "/auth/login",
-        json={"username": username, "password": password},
+        data={"username": username, "password": password},
     )
     assert login_resp.status_code == 200
     data = login_resp.json()

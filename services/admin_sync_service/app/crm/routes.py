@@ -43,7 +43,9 @@ def get_company(company_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/companies/{company_id}/todos", response_model=schemas.ToDoOut)
-def create_todo(company_id: int, todo: schemas.ToDoCreate, db: Session = Depends(get_db)):
+def create_todo(
+    company_id: int, todo: schemas.ToDoCreate, db: Session = Depends(get_db)
+):
     company = db.query(models.Company).filter(models.Company.id == company_id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")

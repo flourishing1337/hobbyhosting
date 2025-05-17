@@ -16,6 +16,13 @@ mail.hobbyhosting.org {
 }
 
 auth.hobbyhosting.org {
+  header {
+    Access-Control-Allow-Origin "https://hobbyhosting.org"
+    Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers "Content-Type, Authorization"
+    Access-Control-Allow-Credentials "true"
+    defer
+  }
   reverse_proxy auth_service:8000
 }
 
@@ -30,4 +37,8 @@ ecom.hobbyhosting.org {
   handle {
     reverse_proxy ecom_frontend:3000
   }
+}
+
+sync.hobbyhosting.org {
+  reverse_proxy admin_sync_service:8000
 }

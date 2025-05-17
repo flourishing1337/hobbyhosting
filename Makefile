@@ -168,3 +168,23 @@ clean-all:
 	docker volume prune -f
 	docker container prune -f
 	docker image prune -f
+
+promote-admin: ## Promota en användare till admin (kräver TOKEN och USERNAME)
+	@echo "Promoting user $$USERNAME using token..."
+	@if [ -z "$$TOKEN" ] || [ -z "$$USERNAME" ]; then \
+		echo "❌ Du måste sätta TOKEN och USERNAME"; \
+		echo "Exempel: make promote-admin TOKEN=... USERNAME=admin@example.com"; \
+		exit 1; \
+	fi; \
+	curl -X POST https://auth.hobbyhosting.org/auth/promote \
+	  -H "Content-Type: application/json" \
+	  -H "Authorization: Bearer $$TOKEN" \
+	  -d '{"username": "'$$USERNAME'"}'
+
+list-users: ## Lista alla användare (kräver TOKEN)
+	@echo "Hämtar användare med tillgångstoken..."
+	@if [ -z "$$TOKEN" ]; then \
+		echo "❌ Du måste sätta TOKEN. Exempel: make list-users TOKEN=..."; \
+		exit 1; \
+	fi; \
+	curl -s -H "Authorization: Bearer $$TOKEN" https://auth.hobbyhosting.org/users | jq

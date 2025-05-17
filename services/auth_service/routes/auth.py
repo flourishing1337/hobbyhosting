@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from shared.security.jwt import create_access_token
 
@@ -18,24 +18,49 @@ class Token(BaseModel):
     token_type: str
 
 
-class UserCreate(BaseModel):
-    email: str
-    password: str
+@router.post("/login")
+async def login(request: Request):
+    try:
+        # Debug logging
+        print(f"Headers: {request.headers}")
+        body = await request.body()
+        print(f"Raw body: {body.decode()}")
+
+        # Parse form data manually
+        form_data = {}
+        for item in body.decode().split("&"):
+            key, value = item.split("=")
+            from urllib.parse import unquote_plus
+
+            form_data[key] = unquote_plus(value)
+
+        print(f"Parsed form data: {form_data}")
+
+        username = form_data.get("username")
+        password = form_data.get("password")
+
+        if not username or not password:
+            return JSONResponse(status_code=400, detail="Missing username or password")
+
+        user = fake_users_db.get(username)
+        if not user or user["password"] != password:
+            return JSONResponse(
+                status_code=401, content={"detail": "Invalid credentials"}
+            )
+
+        access_token = create_access_token(data={"sub": username})
+        return JSONResponse(
+            status_code=200,
+            content={"access_token": access_token, "token_type": "bearer"},
+        )
+    except Exception as e:
+        import traceback
+
+        print(f"Error: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return JSONResponse(status_code=500, content={"detail": str(e)})
 
 
-@router.post("/register", response_model=Token)
-def register(user: UserCreate):
-    if user.email in fake_users_db:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    fake_users_db[user.email] = {"email": user.email, "password": user.password}
-    access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = fake_users_db.get(form_data.username)
-    if not user or user["password"] != form_data.password:
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
-    access_token = create_access_token(data={"sub": form_data.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+@router.get("/health")
+async def health_check():
+    return {"status": "ok"}

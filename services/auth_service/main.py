@@ -1,1 +1,1 @@
-from auth_service.app.main import app
+from app.main import app  # re-export FastAPI instance

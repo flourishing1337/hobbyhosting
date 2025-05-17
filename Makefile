@@ -134,7 +134,7 @@ coverage-report:         ## Visa HTML-rapport för coverage
 migrate:                 ## Alembic-migrering för alla
 	alembic -c services/auth_service/alembic.ini upgrade head
 	alembic -c services/mail_service/alembic.ini upgrade head
-	alembic -c services/ecom/backend/alembic.ini upgrade head
+	alembic -c services/ecommerce/backend/alembic.ini upgrade head
 
 seed-db:                 ## Fyll databas
 	python services/database_service/init-scripts/seed.py
@@ -167,7 +167,7 @@ run-admin-fe:
 	cd services/admin_frontend && yarn dev --port 3100
 
 run-ecom-fe:
-	cd services/ecom/frontend && yarn dev --port 3000
+	cd services/ecommerce/frontend && yarn dev --port 3000
 setup-env:
 	./scripts/setup_env.sh
 

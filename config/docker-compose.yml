@@ -47,9 +47,9 @@ services:
   ecom_backend:
     <<: *common
     build:
-      context: ../services/ecom/backend
+      context: ../services/ecommerce/backend
     container_name: ecom_backend
-    env_file: ../services/ecom/backend/.env.${COMPOSE_PROFILE:-dev}
+    env_file: ../services/ecommerce/backend/.env.${COMPOSE_PROFILE:-dev}
     environment:
       - DATABASE_URL=postgresql://postgres:mysecurepassword@database_service:5432/ecom_db
       - ENV=dev
@@ -62,12 +62,12 @@ services:
   ecom_frontend:
     <<: *common
     build:
-      context: ../services/ecom/frontend
+      context: ../services/ecommerce/frontend
     container_name: ecom_frontend
     env_file:
       - ../.env.${COMPOSE_PROFILE:-dev}
       - ../.env.${COMPOSE_PROFILE:-dev}.frontend
-      - ../services/ecom/frontend/.env.${COMPOSE_PROFILE:-dev}.local
+      - ../services/ecommerce/frontend/.env.${COMPOSE_PROFILE:-dev}.local
     depends_on:
       - ecom_backend
     ports:

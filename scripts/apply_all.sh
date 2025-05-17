@@ -23,7 +23,7 @@ PYTHON
 done
 
 # ─── 2) Health‐endpoint i Ecom backend ─────────────────────
-EFILE="services/ecom/backend/app/main.py"
+EFILE="services/ecommerce/backend/app/main.py"
 if ! grep -q "def health" "$EFILE" 2>/dev/null; then
   cat >> "$EFILE" << 'PYTHON'
 
@@ -35,7 +35,7 @@ PYTHON
 fi
 
 # ─── 3) Health‐endpoint i Next‐frontends ──────────────────
-for FE in services/admin_frontend services/ecom/frontend apps/hobbyhosting-frontend; do
+for FE in services/admin_frontend services/ecommerce/frontend apps/hobbyhosting-frontend; do
   # next/pages/api
   API_DIR="$FE/src/pages/api"
   if [ -d "$API_DIR" ]; then

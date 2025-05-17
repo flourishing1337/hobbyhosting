@@ -110,6 +110,22 @@ python services/auth_service/app/create_admin.py
 
 Alla svar innehåller ett `access_token` som skickas som `Bearer`-token i `Authorization`-headern.
 
+### Felsökning av inloggning
+
+Om svaret du får tillbaka innehåller HTML (t.ex. `<!DOCTYPE html>`)
+beror det oftast på att anropet går till fel domän eller port.
+Se till att auth-tjänsten körs och att du anropar rätt adress,
+exempelvis:
+
+```bash
+curl -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "demo@hobbyhosting.org", "password": "secret123"}'
+```
+
+Svaret ska vara JSON med ett `access_token`. Ett HTML-svar innebär
+vanligtvis en 404- eller proxy-felkod.
+
 ---
 
 ## 🛠 TODO (för vidare utveckling)

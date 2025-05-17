@@ -51,7 +51,7 @@ services:
     container_name: ecom_backend
     env_file: ../services/ecom/backend/.env.${COMPOSE_PROFILE:-dev}
     environment:
-      - DATABASE_URL=postgresql://postgres:mysecurepassword@database_service:5432/ecom_db
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database_service:${POSTGRES_PORT:-5432}/${ECOMMERCE_DB}
       - ENV=dev
     depends_on:
       - database

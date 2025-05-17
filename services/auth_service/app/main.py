@@ -3,7 +3,8 @@ from typing import List
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import (HTTPAuthorizationCredentials,
+                              OAuth2PasswordRequestForm)
 from sqlalchemy.orm import Session
 
 from .dependencies import engine, get_db
@@ -50,7 +51,11 @@ def root_health() -> dict:
 
 
 @app.post("/auth/login", response_model=TokenOut)
-async def login(request: Request, db: Session = Depends(get_db)):
+async def login(
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
     """Authenticate a user and return a JWT token.
 
     Supports both ``application/x-www-form-urlencoded`` and ``application/json``
@@ -58,12 +63,8 @@ async def login(request: Request, db: Session = Depends(get_db)):
     fetch requests sending JSON.
     """
     try:
-        username = None
-        password = None
-
-        form = await request.form()
-        username = form.get("username")
-        password = form.get("password")
+        username = form_data.username
+        password = form_data.password
 
         if not username or not password:
             try:

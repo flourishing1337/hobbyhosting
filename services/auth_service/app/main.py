@@ -3,12 +3,12 @@ from typing import List
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from .dependencies import engine, get_db
 from .hashing import hash_password, verify_password
-from .jwt_utils import create_token, get_current_admin, verify_token
+from .jwt_utils import create_token, get_current_admin, security, verify_token
 from .models import Base, User
 from .schemas import TokenOut, UserCreate, UserOut
 
@@ -38,18 +38,24 @@ app.add_middleware(
 )
 
 
+@app.get("/health")
 @app.get("/auth/health")
 def health():
     return {"status": "ok"}
 
 
 @app.post("/auth/login", response_model=TokenOut)
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
+async def login(request: Request, db: Session = Depends(get_db)):
     try:
-        username = form_data.username
-        password = form_data.password
+        content_type = request.headers.get("content-type", "")
+        if content_type.startswith("application/json"):
+            data = await request.json()
+            username = data.get("username")
+            password = data.get("password")
+        else:
+            form = await request.form()
+            username = form.get("username")
+            password = form.get("password")
 
         logger.info(f"Login attempt for user: {username}")
 
@@ -94,7 +100,17 @@ async def refresh(request: Request):
     return {"access_token": create_token(user.username, user.is_admin)}
 
 
-@app.post("/register", status_code=201)
+@app.get("/auth/me", response_model=UserOut)
+def read_me(auth: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    payload = verify_token(auth.credentials)
+    username = payload["sub"]
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(404, detail="User not found")
+    return UserOut.model_validate(user)
+
+
+@app.post("/auth/register", status_code=201)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.username == user.username).first():
         raise HTTPException(400, detail="Username already exists")

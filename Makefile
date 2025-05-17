@@ -26,13 +26,13 @@ endif
 .DEFAULT_GOAL := help
 
 .PHONY: help up down restart rebuild ps logs \
-        restart-% logs-% rebuild-% \
-        health-all health-auth health-mail health-ecom-backend health-ecom-frontend health-admin-frontend health-main-frontend \
-        lint format test coverage-report \
-        migrate seed-db backup-db \
-        tag-release docker-push deploy \
-        run-auth run-admin-fe run-ecom-fe \
-        clean-all
+	restart-% logs-% rebuild-% \
+	health-all health-auth health-mail health-ecommerce-backend health-ecommerce-frontend health-admin-panel health-public-site \
+	lint format test coverage-report \
+	migrate seed-db backup-db \
+	tag-release docker-push deploy \
+	run-auth run-admin-panel run-ecommerce-fe \
+	clean-all
 
 ## 📚 Hjälp: visa tillgängliga make-kommandon
 help:
@@ -76,31 +76,31 @@ rebuild-%:               ## Rebuild enskild tjänst
 # ─── Healthchecks ──────────────────────────────────────────────
 
 health-auth:             ## /auth/health internt via frontend-container
-	docker exec -i hobbyhosting_frontend wget -qO- http://auth_service:8000/auth/health || echo "❌ auth_service"
+	docker exec -i public_site wget -qO- http://auth_service:8000/auth/health || echo "❌ auth_service"
 
 health-mail:
 	@curl -sf http://localhost:5000/health | jq . || echo "❌ mail_service"
 
-health-ecom-backend:
-	@curl -sf http://localhost:8001/health | jq . || echo "❌ ecom_backend"
+health-ecommerce-backend:
+	@curl -sf http://localhost:8001/health | jq . || echo "❌ ecommerce_backend"
 
-health-ecom-frontend:
-	@curl -sf http://localhost:3000/api/health | jq . || echo "❌ ecom_frontend"
+health-ecommerce-frontend:
+	@curl -sf http://localhost:3000/api/health | jq . || echo "❌ ecommerce_frontend"
 
-health-admin-frontend:
-	@curl -sf http://localhost:3100/api/health | jq . || echo "❌ admin_frontend"
+health-admin-panel:
+	@curl -sf http://localhost:3100/api/health | jq . || echo "❌ admin_panel"
 
-health-main-frontend:
-	@curl -sf http://localhost:8080/api/health | jq . || echo "❌ hobbyhosting_frontend"
+health-public-site:
+	@curl -sf http://localhost:8080/api/health | jq . || echo "❌ public_site"
 
 health-all:              ## Kör alla health endpoints
 	@echo "🔍 Kör health-checks..."
 	@$(MAKE) health-auth
 	@$(MAKE) health-mail
-	@$(MAKE) health-ecom-backend
-	@$(MAKE) health-ecom-frontend
-	@$(MAKE) health-admin-frontend
-	@$(MAKE) health-main-frontend
+	@$(MAKE) health-ecommerce-backend
+	@$(MAKE) health-ecommerce-frontend
+	@$(MAKE) health-admin-panel
+	@$(MAKE) health-public-site
 	@echo "✅  Klart."
 
 # ─── Kodkvalitet ───────────────────────────────────────────────
@@ -163,11 +163,11 @@ run-auth:
 	PYTHONPATH=$$(realpath services) \
 	uvicorn auth_service.main:app --reload --host 0.0.0.0 --port 8000
 
-run-admin-fe:
-	cd services/admin_frontend && yarn dev --port 3100
+run-admin-panel:
+	cd apps/admin_panel && yarn dev --port 3100
 
-run-ecom-fe:
-	cd services/ecom/frontend && yarn dev --port 3000
+run-ecommerce-fe:
+	cd services/ecommerce/frontend && yarn dev --port 3000
 
 # ─── Housekeeping ─────────────────────────────────────────────
 

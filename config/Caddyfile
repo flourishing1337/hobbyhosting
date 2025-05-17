@@ -4,11 +4,11 @@
 }
 
 admin.hobbyhosting.org {
-  reverse_proxy admin_frontend:3000
+  reverse_proxy admin_panel:3000
 }
 
 hobbyhosting.org {
-  reverse_proxy hobbyhosting_frontend:3000
+  reverse_proxy public_site:3000
 }
 
 mail.hobbyhosting.org {
@@ -30,12 +30,12 @@ ecom.hobbyhosting.org {
   # Route API requests to the backend
   handle_path /api/* {
     uri strip_prefix /api
-    reverse_proxy ecom_backend:8000
+    reverse_proxy ecommerce_backend:8000
   }
 
   # Route all other requests to the frontend
   handle {
-    reverse_proxy ecom_frontend:3000
+    reverse_proxy ecommerce_frontend:3000
   }
 }
 

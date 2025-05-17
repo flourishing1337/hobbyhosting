@@ -19,7 +19,7 @@ for target in .env.dev .env.prod; do
 # POSTGRES_PASSWORD=
 # AUTH_DB=
 # MAIL_DB=
-# ECOMMERCE_DB=
+# ECOM_DB=
 # RESEND_API_KEY=
 # MAIL_FROM=
 # JWT_SECRET=

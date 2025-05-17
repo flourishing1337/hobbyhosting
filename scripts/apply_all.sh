@@ -78,7 +78,7 @@ for ENVF in .env.dev .env.prod; do
 # POSTGRES_PASSWORD=
 # AUTH_DB=
 # MAIL_DB=
-# ECOMMERCE_DB=
+# ECOM_DB=
 EOF
     fi
     echo "  ✓ Skapade $ENVF"

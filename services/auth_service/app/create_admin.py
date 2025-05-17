@@ -1,6 +1,6 @@
-from dependencies import engine, get_db
-from hashing import hash_password
-from models import Base, User
+from .dependencies import engine, get_db
+from .hashing import hash_password
+from .models import Base, User
 
 
 def create_admin():

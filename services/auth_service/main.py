@@ -1,11 +1,8 @@
-from auth_service.routes.auth import router as auth_router
-from fastapi import FastAPI
+"""Auth service entry point.
 
-app = FastAPI()
+This module simply re-exports the FastAPI ``app`` instance defined in
+``auth_service.app.main`` so that tools like ``uvicorn`` can run it directly.
+"""
 
-app.include_router(auth_router)
+from auth_service.app.main import app
 
-
-@app.get("/health", tags=["health"])
-def health():
-    return {"status": "ok"}

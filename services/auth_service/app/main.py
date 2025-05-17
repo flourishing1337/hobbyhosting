@@ -3,12 +3,12 @@ from typing import List
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .dependencies import engine, get_db
 from .hashing import hash_password, verify_password
-from .jwt_utils import create_token, get_current_admin, verify_token
+from .jwt_utils import create_token, get_current_admin, security, verify_token
 from .models import Base, User
 from .schemas import TokenOut, UserCreate, UserOut
 
@@ -39,17 +39,37 @@ app.add_middleware(
 
 
 @app.get("/auth/health")
-def health():
+def health() -> dict:
+    return {"status": "ok"}
+
+
+@app.get("/health", tags=["health"])
+def root_health() -> dict:
+    """Alias for ``/auth/health`` so containers can be health-checked easily."""
     return {"status": "ok"}
 
 
 @app.post("/auth/login", response_model=TokenOut)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
+    """Authenticate a user and return a JWT token.
+
+    Supports both ``application/x-www-form-urlencoded`` and JSON payloads.
+    """
     try:
         username = form_data.username
         password = form_data.password
+
+        if not username or not password:
+            try:
+                json_body = await request.json()
+            except Exception:
+                json_body = {}
+            username = username or json_body.get("username")
+            password = password or json_body.get("password")
 
         logger.info(f"Login attempt for user: {username}")
 
@@ -94,7 +114,17 @@ async def refresh(request: Request):
     return {"access_token": create_token(user.username, user.is_admin)}
 
 
-@app.post("/register", status_code=201)
+@app.get("/auth/me", response_model=UserOut)
+def read_me(auth: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    payload = verify_token(auth.credentials)
+    username = payload["sub"]
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(404, detail="User not found")
+    return UserOut.model_validate(user)
+
+
+@app.post("/auth/register", status_code=201)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.username == user.username).first():
         raise HTTPException(400, detail="Username already exists")

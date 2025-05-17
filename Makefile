@@ -106,7 +106,7 @@ health-all:              ## Kör alla health endpoints
 # ─── Kodkvalitet ───────────────────────────────────────────────
 
 lint:                    ## ESLint + Ruff
-	@if ls apps/*/src services/*/src >/dev/null 2>&1; then \
+	@if find apps services -type d -path '*/src' | grep -q .; then \
 	npx eslint apps/**/src services/**/src --max-warnings 0; \
 	else \
 	echo "No JS/TS sources, skipping ESLint"; \
@@ -119,12 +119,12 @@ format:                  ## Prettier + Ruff + isort
 	isort services
 		
 test:                    ## Pytest + Jest
-	PYTHONPATH=$$PYTHONPATH:$$(pwd)/services python3 -m pytest -q
-	@if [ -f package.json ]; then \
-	npx jest --coverage; \
-else \
-echo "No package.json found, skipping Jest"; \
-fi
+	       PYTHONPATH=$$PYTHONPATH:$$(pwd)/services python3 -m pytest -q
+	       @if [ -f package.json ]; then \
+	               npx jest --coverage; \
+	       else \
+	               echo "No package.json found, skipping Jest"; \
+	       fi
 
 coverage-report:         ## Visa HTML-rapport för coverage
 	python -m webbrowser -t htmlcov/index.html || true

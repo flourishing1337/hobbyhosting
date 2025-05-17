@@ -48,6 +48,8 @@ make health-auth
 | hobbyhosting.org         | Publik sida        |
 | auth.hobbyhosting.org    | Autentiseringstjänst |
 | admin.hobbyhosting.org   | Adminpanel (Next.js) |
+| mail.hobbyhosting.org   | Mail-service |
+| ecom.hobbyhosting.org   | E-commerce site |
 
 ---
 

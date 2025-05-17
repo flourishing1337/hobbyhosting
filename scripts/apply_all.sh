@@ -123,6 +123,6 @@ if command -v pre-commit &>/dev/null; then
   git push
   echo "✅ Allt klart och pushed!"
 else
-  echo "⚠️ pre-commit saknas, committa manuellt:"
+  echo "⚠ pre-commit not found – run manually:"
   echo "    git add -A && pre-commit run --all-files && git add -A && git commit -m '...' && git push"
 fi

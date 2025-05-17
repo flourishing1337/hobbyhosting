@@ -3,9 +3,8 @@ import requests
 BASE_URL = "http://localhost:8000"
 
 data = {
-    "email": "admin@hobbyhosting.org",
+    "username": "admin@hobbyhosting.org",
     "password": "supersecret123",
-    "is_admin": True,
 }
 
 response = requests.post(f"{BASE_URL}/auth/register", json=data)

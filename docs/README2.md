@@ -41,6 +41,19 @@ make health-auth
 
 ---
 
+## 🔑 Miljövariabler
+
+Exempel finns i `.env.example`.
+
+### Mail Service
+
+- `RESEND_API_KEY` – API-nyckel för utskick via Resend
+- `MAIL_FROM` – standardavsändare
+- `JWT_SECRET` – hemlighet för verifiering av tokens
+- `JWT_ALGO` – algoritm för signering (default HS256)
+
+---
+
 ## 🌐 Subdomäner
 
 | Subdomän                  | Beskrivning        |

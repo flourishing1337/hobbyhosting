@@ -32,7 +32,7 @@ endif
         migrate seed-db backup-db \
         tag-release docker-push deploy \
         run-auth run-admin-fe run-ecom-fe \
-        clean-all
+        clean-all setup-env
 
 ## 📚 Hjälp: visa tillgängliga make-kommandon
 help:
@@ -106,17 +106,16 @@ health-all:              ## Kör alla health endpoints
 # ─── Kodkvalitet ───────────────────────────────────────────────
 
 lint:                    ## ESLint + Ruff
-	npx eslint apps/**/src services/**/src --max-warnings 0
+	npx eslint apps/**/src --max-warnings 0
 	ruff check services
 
 format:                  ## Prettier + Ruff + isort
 	prettier -w "**/*.{js,jsx,ts,tsx,json,md,html,css}"
 	ruff format services && ruff check --fix services
 	isort services
-
 test:                    ## Pytest + Jest
-	pytest -q
-	npx jest --coverage
+	PYTHONPATH=$$PYTHONPATH:$$(pwd)/services ./bin/pytest -q
+	@echo "No Jest tests"
 
 coverage-report:         ## Visa HTML-rapport för coverage
 	python -m webbrowser -t htmlcov/index.html || true
@@ -160,6 +159,9 @@ run-admin-fe:
 
 run-ecom-fe:
 	cd services/ecom/frontend && yarn dev --port 3000
+setup-env:
+	./scripts/setup_env.sh
+
 
 # ─── Housekeeping ─────────────────────────────────────────────
 

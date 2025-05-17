@@ -1,12 +1,14 @@
 # 📁 apps/admin_sync_service/app/main.py
 from datetime import datetime, timedelta
+from typing import List
 
+from admin_sync_service.app.chat.models import ChatMessage
+from admin_sync_service.app.chat.schemas import (ChatMessageCreate,
+                                                 ChatMessageOut)
 from admin_sync_service.app.crm.routes import router as crm_router
 from admin_sync_service.app.dependencies import Base, engine, get_db
 from admin_sync_service.app.sync.models import Sync
-from admin_sync_service.app.sync.schemas import (  # Flytta gärna till app/sync/schemas.py
-    SyncCreate,
-)
+from admin_sync_service.app.sync.schemas import SyncCreate
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -136,6 +138,27 @@ async def get_syncs(
 ):
     syncs = db.query(Sync).all()
     return syncs
+
+
+@app.post("/chat/messages", response_model=ChatMessageOut)
+async def create_chat_message(
+    msg: ChatMessageCreate,
+    username: str = Depends(verify_token),
+    db: Session = Depends(get_db),
+):
+    chat = ChatMessage(username=username, message=msg.message)
+    db.add(chat)
+    db.commit()
+    db.refresh(chat)
+    return chat
+
+
+@app.get("/chat/messages", response_model=List[ChatMessageOut])
+async def list_chat_messages(
+    username: str = Depends(verify_token), db: Session = Depends(get_db)
+):
+    chats = db.query(ChatMessage).order_by(ChatMessage.created_at).all()
+    return chats
 
 
 # CRM router

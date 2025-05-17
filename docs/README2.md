@@ -10,6 +10,8 @@ Ett modernt DevOps-baserat plattformsprojekt byggt med microservices, Docker, Fa
 hobbyhosting/
 ├── apps/                  # Fristående appar (frontend/adminjs etc)
 │   └── hobbyhosting-frontend/
+├── packages/
+│   └── ui/                # Återanvändbara React-komponenter
 ├── services/              # Backend-tjänster
 │   ├── auth_service/
 │   ├── mail_service/
@@ -44,6 +46,7 @@ make health-auth
 ## 🔑 Miljövariabler
 
 Exempel finns i `.env.example`.
+Development and production configs are generated with `./scripts/setup_env.sh`, creating `.env.dev` and `.env.prod`.
 
 ### Mail Service
 
@@ -71,6 +74,22 @@ Exempel finns i `.env.example`.
 - Allt byggs och körs genom `config/docker-compose.yml`
 - Caddy hanterar HTTPS + domäner automatiskt
 - Alla tjänster körs via interna nätverk (`backend`)
+
+---
+
+## 🎨 Frontend & UI
+
+Det finns ett separat paket `packages/ui` som innehåller återanvändbara
+React-komponenter. Installera beroenden och bygg paketet via:
+
+```bash
+cd packages/ui
+npm install
+npm run build
+```
+
+Dessa komponenter kan sedan importeras i admin-frontenden för en enhetlig
+design.
 
 ---
 
@@ -142,6 +161,7 @@ vanligtvis en 404- eller proxy-felkod.
 - Lägga till CI/CD
 - Integrera mailutskick
 - Lägg till docs för hur auth fungerar
+- Bygg vidare på `packages/ui` för delad design
 
 ---
 

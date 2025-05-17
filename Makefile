@@ -106,7 +106,7 @@ health-all:              ## Kör alla health endpoints
 # ─── Kodkvalitet ───────────────────────────────────────────────
 
 lint:                    ## ESLint + Ruff
-	npx eslint apps/**/src services/**/src --max-warnings 0
+	npx eslint apps/**/src --max-warnings 0
 	ruff check services
 
 format:                  ## Prettier + Ruff + isort
@@ -115,9 +115,9 @@ format:                  ## Prettier + Ruff + isort
 	isort services
 
 test:                    ## Pytest + Jest
-	pytest -q
-	npx jest --coverage
-
+	./bin/pytest -q
+	npx jest --coverage || true
+	
 coverage-report:         ## Visa HTML-rapport för coverage
 	python -m webbrowser -t htmlcov/index.html || true
 

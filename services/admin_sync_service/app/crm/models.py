@@ -1,4 +1,3 @@
-
 from app.dependencies import Base
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -12,7 +11,9 @@ class Company(Base):
     status = Column(String, default="active")
     notes = Column(Text)
 
-    contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
+    contacts = relationship(
+        "Contact", back_populates="company", cascade="all, delete-orphan"
+    )
     todos = relationship("ToDo", back_populates="company", cascade="all, delete-orphan")
 
 

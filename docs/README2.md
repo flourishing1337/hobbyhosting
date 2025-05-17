@@ -9,11 +9,12 @@ Ett modernt DevOps-baserat plattformsprojekt byggt med microservices, Docker, Fa
 ```
 hobbyhosting/
 ├── apps/                  # Fristående appar (frontend/adminjs etc)
-│   └── hobbyhosting-frontend/
+│   ├── public_site/
+│   └── admin_panel/
 ├── services/              # Backend-tjänster
 │   ├── auth_service/
 │   ├── mail_service/
-│   ├── ecom/
+│   ├── ecommerce/
 │   ├── database_service/
 │   └── shared/            # Delad kod mellan tjänster
 ├── config/                # DevOps, Caddy, docker-compose
@@ -56,13 +57,13 @@ Exempel finns i `.env.example`.
 
 ## 🌐 Subdomäner
 
-| Subdomän               | Beskrivning          |
-| ---------------------- | -------------------- |
-| hobbyhosting.org       | Publik sida          |
-| auth.hobbyhosting.org  | Autentiseringstjänst |
-| admin.hobbyhosting.org | Adminpanel (Next.js) |
-| mail.hobbyhosting.org  | Mail-service         |
-| ecom.hobbyhosting.org  | E-commerce site      |
+| Subdomän               | Beskrivning           |
+| ---------------------- | --------------------- |
+| hobbyhosting.org       | Publik sida           |
+| auth.hobbyhosting.org  | Autentiseringstjänst  |
+| admin.hobbyhosting.org | Admin Panel (Next.js) |
+| mail.hobbyhosting.org  | Mail-service          |
+| ecom.hobbyhosting.org  | E-commerce site       |
 
 ---
 
@@ -138,7 +139,7 @@ vanligtvis en 404- eller proxy-felkod.
 
 ## 🛠 TODO (för vidare utveckling)
 
-- Rensa upp gammal kod i hobbyhosting-frontend
+- Rensa upp gammal kod i public_site
 - Lägga till CI/CD
 - Integrera mailutskick
 - Lägg till docs för hur auth fungerar

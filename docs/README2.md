@@ -93,6 +93,12 @@ Det använder `pytest` för Python och `jest` för JavaScript.
 | admin@hobbyhosting.org   | 1337         |
 | demo@hobbyhosting.org    | secret123    |
 
+Kör skriptet nedan för att skapa admins användare lokalt:
+
+```bash
+python services/auth_service/app/create_admin.py
+```
+
 ---
 
 ## Auth Service API

@@ -26,6 +26,7 @@ docker-compose.override.yml
 # ▶ Env & secrets
 .env
 .env.*
+!.env.example
 auth.token
 
 # ▶ Misc

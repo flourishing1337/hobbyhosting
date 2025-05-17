@@ -43,61 +43,61 @@ services:
     ports:
       - "5000:5000"
 
-  ### ───── ECOM BACKEND ─────
-  ecom_backend:
+  ### ───── ECOMMERCE BACKEND ─────
+  ecommerce_backend:
     <<: *common
     build:
-      context: ../services/ecom/backend
-    container_name: ecom_backend
-    env_file: ../services/ecom/backend/.env.${COMPOSE_PROFILE:-dev}
+      context: ../services/ecommerce/backend
+    container_name: ecommerce_backend
+    env_file: ../services/ecommerce/backend/.env.${COMPOSE_PROFILE:-dev}
     environment:
-      - DATABASE_URL=postgresql://postgres:mysecurepassword@database_service:5432/ecom_db
+      - DATABASE_URL=postgresql://postgres:mysecurepassword@database_service:5432/${ECOMMERCE_DB}
       - ENV=dev
     depends_on:
       - database
     ports:
       - "8001:8000"
 
-  ### ───── ECOM FRONTEND ─────
-  ecom_frontend:
+  ### ───── ECOMMERCE FRONTEND ─────
+  ecommerce_frontend:
     <<: *common
     build:
-      context: ../services/ecom/frontend
-    container_name: ecom_frontend
+      context: ../services/ecommerce/frontend
+    container_name: ecommerce_frontend
     env_file:
       - ../.env.${COMPOSE_PROFILE:-dev}
       - ../.env.${COMPOSE_PROFILE:-dev}.frontend
-      - ../services/ecom/frontend/.env.${COMPOSE_PROFILE:-dev}.local
+      - ../services/ecommerce/frontend/.env.${COMPOSE_PROFILE:-dev}.local
     depends_on:
-      - ecom_backend
+      - ecommerce_backend
     ports:
       - "3000:3000"
 
-  ### ───── ADMIN FRONTEND ─────
-  admin_frontend:
+  ### ───── ADMIN PANEL ─────
+  admin_panel:
     <<: *common
     build:
-      context: ../services/admin_frontend
-    container_name: admin_frontend
+      context: ../apps/admin_panel
+    container_name: admin_panel
     env_file:
       - ../.env.${COMPOSE_PROFILE:-dev}
       - ../.env.${COMPOSE_PROFILE:-dev}.frontend
-      - ../services/admin_frontend/.env.${COMPOSE_PROFILE:-dev}.local
+      - ../apps/admin_panel/.env.${COMPOSE_PROFILE:-dev}.local
     depends_on:
       - auth_service
     ports:
       - "3100:3000"
 
-  ### ───── MAIN FRONTEND ─────
-  hobbyhosting_frontend:
+  ### ───── PUBLIC SITE ─────
+  public_site:
     <<: *common
     build:
-      context: ../apps/hobbyhosting-frontend
-    container_name: hobbyhosting_frontend
+      context: ../apps/public_site
+    container_name: public_site
     env_file:
       - ../.env.${COMPOSE_PROFILE:-dev}
       - ../.env.${COMPOSE_PROFILE:-dev}.frontend
-      - ../apps/hobbyhosting-frontend/.env.${COMPOSE_PROFILE:-dev}.local
+      - ../apps/public_site/.env.${COMPOSE_PROFILE:-dev}.local
     depends_on:
       - auth_service
     ports:
@@ -124,10 +124,10 @@ services:
     depends_on:
       - auth_service
       - mail_service
-      - ecom_backend
-      - ecom_frontend
-      - admin_frontend
-      - hobbyhosting_frontend
+      - ecommerce_backend
+      - ecommerce_frontend
+      - admin_panel
+      - public_site
     ports:
       - "80:80"
       - "443:443"

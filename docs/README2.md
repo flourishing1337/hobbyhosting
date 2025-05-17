@@ -72,6 +72,18 @@ Exempel finns i `.env.example`.
 
 ---
 
+## 🧪 Tester
+
+Kör alla enhetstester och frontendtester med:
+
+```bash
+make test
+```
+
+Det använder `pytest` för Python och `jest` för JavaScript.
+
+---
+
 ## 🧪 Testanvändare
 
 | Email                    | Lösenord     |

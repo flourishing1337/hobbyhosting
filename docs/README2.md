@@ -153,6 +153,16 @@ curl -X POST http://localhost:8000/auth/login \
 Svaret ska vara JSON med ett `access_token`. Ett HTML-svar innebär
 vanligtvis en 404- eller proxy-felkod.
 
+## Använda enkla inloggningssidor
+
+Det finns statiska filer i `apps/public_site` som visar hur du kan logga in
+och registrera dig utan ett fullständigt frontendbygge. Öppna `login.html`
+eller `register.html` i webbläsaren medan auth-tjänsten kör lokalt på
+`http://localhost:8000`. Vid lyckad inloggning sparas `access_token` i
+`localStorage` och du skickas vidare till `welcome.html`. Markerar du rutan
+"Log in after registration" sker inloggningen automatiskt efter lyckad
+registrering.
+
 ---
 
 ## 🛠 TODO (för vidare utveckling)

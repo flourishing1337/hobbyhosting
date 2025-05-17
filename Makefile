@@ -6,7 +6,7 @@
 # Konfig
 COMPOSE_FILE        := config/docker-compose.yml
 COMPOSE_PROFILE     ?= dev
-DOCKER_COMPOSE      := docker compose -f $(COMPOSE_FILE)
+DOCKER_COMPOSE      := docker compose --env-file .env.$(COMPOSE_PROFILE) -f $(COMPOSE_FILE)
 DOCKER_BUILD_FLAGS  := --no-cache
 ENV_FILE            := .env.$(COMPOSE_PROFILE)
 

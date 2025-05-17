@@ -8,7 +8,7 @@ data = {
     "is_admin": True,
 }
 
-response = requests.post(f"{BASE_URL}/register", json=data)
+response = requests.post(f"{BASE_URL}/auth/register", json=data)
 
 print("✅ Response:", response.status_code)
 print(response.json())

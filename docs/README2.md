@@ -46,6 +46,7 @@ make health-auth
 ## 🔑 Miljövariabler
 
 Exempel finns i `.env.example`.
+Development and production configs are generated with `./scripts/setup_env.sh`, creating `.env.dev` and `.env.prod`.
 
 ### Mail Service
 

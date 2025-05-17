@@ -32,7 +32,7 @@ endif
         migrate seed-db backup-db \
         tag-release docker-push deploy \
         run-auth run-admin-fe run-ecom-fe \
-        clean-all
+        clean-all setup-env
 
 ## 📚 Hjälp: visa tillgängliga make-kommandon
 help:
@@ -168,6 +168,9 @@ run-admin-fe:
 
 run-ecom-fe:
 	cd services/ecom/frontend && yarn dev --port 3000
+setup-env:
+	./scripts/setup_env.sh
+
 
 # ─── Housekeeping ─────────────────────────────────────────────
 

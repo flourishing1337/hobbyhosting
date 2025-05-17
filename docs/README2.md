@@ -56,13 +56,13 @@ Exempel finns i `.env.example`.
 
 ## 🌐 Subdomäner
 
-| Subdomän                  | Beskrivning        |
-|--------------------------|--------------------|
-| hobbyhosting.org         | Publik sida        |
-| auth.hobbyhosting.org    | Autentiseringstjänst |
-| admin.hobbyhosting.org   | Adminpanel (Next.js) |
-| mail.hobbyhosting.org   | Mail-service |
-| ecom.hobbyhosting.org   | E-commerce site |
+| Subdomän               | Beskrivning          |
+| ---------------------- | -------------------- |
+| hobbyhosting.org       | Publik sida          |
+| auth.hobbyhosting.org  | Autentiseringstjänst |
+| admin.hobbyhosting.org | Adminpanel (Next.js) |
+| mail.hobbyhosting.org  | Mail-service         |
+| ecom.hobbyhosting.org  | E-commerce site      |
 
 ---
 
@@ -88,10 +88,10 @@ Det använder `pytest` för Python och `jest` för JavaScript.
 
 ## 🧪 Testanvändare
 
-| Email                    | Lösenord     |
-|--------------------------|--------------|
-| admin@hobbyhosting.org   | 1337         |
-| demo@hobbyhosting.org    | secret123    |
+| Email                  | Lösenord  |
+| ---------------------- | --------- |
+| admin@hobbyhosting.org | 1337      |
+| demo@hobbyhosting.org  | secret123 |
 
 Kör skriptet nedan för att skapa admins användare lokalt:
 
@@ -103,10 +103,11 @@ python services/auth_service/app/create_admin.py
 
 ## Auth Service API
 
-- `POST /auth/login` – logga in och få JWT-token
+- `POST /auth/login` – logga in och få JWT-token. Accepterar både `application/x-www-form-urlencoded` och `application/json` payloads
 - `POST /auth/refresh` – byt ut ett giltigt token mot ett nytt
 - `GET /auth/me` – hämta aktuell användare (kräver `Authorization` header)
 - `POST /auth/register` – skapa ny användare
+- `GET /auth/health` – hälsokontroll för tjänsten (finns även som `GET /health`)
 
 Alla svar innehåller ett `access_token` som skickas som `Bearer`-token i `Authorization`-headern.
 

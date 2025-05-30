@@ -92,16 +92,14 @@ services:
   hobbyhosting_frontend:
     <<: *common
     build:
-      context: ../apps/hobbyhosting-frontend
+      context: ../apps/public_site
     container_name: hobbyhosting_frontend
     env_file:
       - ../.env.${COMPOSE_PROFILE:-dev}
-      - ../.env.${COMPOSE_PROFILE:-dev}.frontend
-      - ../apps/hobbyhosting-frontend/.env.${COMPOSE_PROFILE:-dev}.local
     depends_on:
       - auth_service
     ports:
-      - "8080:3000"
+      - "8080:80"
 
   ### ───── ADMIN SYNC SERVICE ─────
   admin_sync_service:

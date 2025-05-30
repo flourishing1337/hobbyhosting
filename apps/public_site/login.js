@@ -7,7 +7,7 @@ form.addEventListener("submit", async (e) => {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
   try {
-    const resp = await fetch("http://localhost:8000/auth/login", {
+    const resp = await fetch("https://auth.hobbyhosting.org/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

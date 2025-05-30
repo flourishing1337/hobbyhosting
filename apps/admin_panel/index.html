@@ -7,5 +7,50 @@
   <body>
     <h1>Admin Panel Placeholder</h1>
     <p>This is a placeholder for the admin panel.</p>
+
+    <h2>Upload File</h2>
+    <form id="uploadForm">
+      <input type="file" name="upload_file" />
+      <button type="submit">Upload</button>
+    </form>
+
+    <h2>Files</h2>
+    <ul id="files"></ul>
+
+    <script>
+      async function loadFiles() {
+        const resp = await fetch("http://localhost:8000/files");
+        if (!resp.ok) return;
+        const files = await resp.json();
+        const list = document.getElementById("files");
+        list.innerHTML = "";
+        files.forEach((f) => {
+          const li = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = `http://localhost:8000/files/${f.id}/download`;
+          link.textContent = f.filename;
+          li.appendChild(link);
+          li.appendChild(
+            document.createTextNode(` (uploaded by ${f.uploaded_by})`),
+          );
+          list.appendChild(li);
+        });
+      }
+
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          await fetch("http://localhost:8000/files", {
+            method: "POST",
+            body: formData,
+          });
+          e.target.reset();
+          loadFiles();
+        });
+
+      loadFiles();
+    </script>
   </body>
 </html>

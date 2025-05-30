@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Header from "../components/Header";
 import "../styles/globals.css";
 
 export default function Film() {
@@ -31,9 +32,7 @@ export default function Film() {
 
   return (
     <div>
-      <header>
-        <h1>HobbyHosting</h1>
-      </header>
+      <Header />
       <main className="container">
         <h2>We film your business</h2>
         <p>Get a professional promo video for $500.</p>

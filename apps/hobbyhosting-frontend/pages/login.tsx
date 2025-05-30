@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import Header from "../components/Header";
 import "../styles/globals.css";
 
 export default function Login() {
@@ -37,9 +38,7 @@ export default function Login() {
 
   return (
     <div>
-      <header>
-        <h1>HobbyHosting</h1>
-      </header>
+      <Header />
       <main className="container">
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>

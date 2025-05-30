@@ -9,7 +9,23 @@ header {
   background-color: #4f46e5;
   color: #fff;
   padding: 1rem 2rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header nav a {
+  color: #fff;
+  margin-left: 1rem;
+  text-decoration: none;
+}
+
+header nav a:hover {
+  text-decoration: underline;
 }
 main {
   padding: 2rem;

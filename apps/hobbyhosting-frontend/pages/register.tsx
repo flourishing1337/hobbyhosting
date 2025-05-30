@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import Header from "../components/Header";
 import "../styles/globals.css";
 
 export default function Register() {
@@ -36,9 +37,7 @@ export default function Register() {
 
   return (
     <div>
-      <header>
-        <h1>HobbyHosting</h1>
-      </header>
+      <Header />
       <main className="container">
         <h2>Register</h2>
         <form onSubmit={handleSubmit}>

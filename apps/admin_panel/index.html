@@ -2,10 +2,98 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Admin Panel Placeholder</title>
+    <title>Admin Panel</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+      button {
+        margin-right: 5px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Admin Panel Placeholder</h1>
-    <p>This is a placeholder for the admin panel.</p>
+    <h1>User Administration</h1>
+    <p id="status"></p>
+    <table id="users">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Admin</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      async function fetchUsers() {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          document.getElementById("status").textContent =
+            "Please log in first.";
+          return;
+        }
+        const resp = await fetch("https://auth.hobbyhosting.org/users", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!resp.ok) {
+          document.getElementById("status").textContent =
+            "Failed to load users";
+          return;
+        }
+        const data = await resp.json();
+        const tbody = document.querySelector("#users tbody");
+        tbody.innerHTML = "";
+        data.forEach((u) => {
+          const tr = document.createElement("tr");
+          const admin = u.is_admin;
+          tr.innerHTML =
+            `<td>${u.username}</td>` +
+            `<td>${admin ? "Yes" : "No"}</td>` +
+            `<td></td>`;
+          const actions = document.createElement("td");
+          const btn = document.createElement("button");
+          btn.textContent = admin ? "Demote" : "Promote";
+          btn.onclick = () => toggleAdmin(u.username, admin);
+          actions.appendChild(btn);
+          tr.replaceChild(actions, tr.children[2]);
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function toggleAdmin(username, isAdmin) {
+        const token = localStorage.getItem("access_token");
+        const endpoint = isAdmin ? "demote" : "promote";
+        const resp = await fetch(
+          `https://auth.hobbyhosting.org/auth/${endpoint}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username }),
+          },
+        );
+        if (resp.ok) {
+          fetchUsers();
+        } else {
+          alert("Operation failed");
+        }
+      }
+
+      fetchUsers();
+    </script>
   </body>
 </html>

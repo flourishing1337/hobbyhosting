@@ -7,6 +7,7 @@ from admin_sync_service.app.chat.schemas import (ChatMessageCreate,
                                                  ChatMessageOut)
 from admin_sync_service.app.crm.routes import router as crm_router
 from admin_sync_service.app.dependencies import Base, engine, get_db
+from admin_sync_service.app.files.routes import router as files_router
 from admin_sync_service.app.sync.models import Sync
 from admin_sync_service.app.sync.schemas import SyncCreate
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -163,3 +164,4 @@ async def list_chat_messages(
 
 # CRM router
 app.include_router(crm_router)
+app.include_router(files_router)

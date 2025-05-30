@@ -1,37 +1,37 @@
-import { useState } from 'react';
-import Link from 'next/link';
-import '../styles/globals.css';
+import { useState } from "react";
+import Link from "next/link";
+import "../styles/globals.css";
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setMessage('');
+    setMessage("");
     try {
-      const resp = await fetch('http://localhost:8000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const resp = await fetch("https://auth.hobbyhosting.org/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
       const data = await resp.json().catch(() => null);
       if (!resp.ok || !data) {
-        setMessage((data && data.detail) || 'Login failed');
+        setMessage((data && data.detail) || "Login failed");
         return;
       }
       if (data.access_token) {
-        localStorage.setItem('access_token', data.access_token);
-        setMessage('Success! Redirecting...');
+        localStorage.setItem("access_token", data.access_token);
+        setMessage("Success! Redirecting...");
         setTimeout(() => {
-          window.location.href = '/welcome';
+          window.location.href = "/welcome";
         }, 500);
       } else {
-        setMessage('Unexpected response');
+        setMessage("Unexpected response");
       }
     } catch {
-      setMessage('Network error');
+      setMessage("Network error");
     }
   }
 
@@ -44,12 +44,23 @@ export default function Login() {
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>
           <label>
-            Username:<br />
-            <input value={username} onChange={e => setUsername(e.target.value)} required />
+            Username:
+            <br />
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
           </label>
           <label>
-            Password:<br />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+            Password:
+            <br />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </label>
           <button type="submit">Login</button>
         </form>

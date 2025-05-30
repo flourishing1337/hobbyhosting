@@ -9,7 +9,7 @@ form.addEventListener("submit", async (e) => {
   const password = document.getElementById("password").value;
   const autoLogin = document.getElementById("auto-login").checked;
   try {
-    const resp = await fetch("http://localhost:8000/auth/register", {
+    const resp = await fetch("https://auth.hobbyhosting.org/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),
@@ -33,7 +33,7 @@ form.addEventListener("submit", async (e) => {
 
 async function login(username, password) {
   try {
-    const resp = await fetch("http://localhost:8000/auth/login", {
+    const resp = await fetch("https://auth.hobbyhosting.org/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

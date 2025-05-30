@@ -2,29 +2,35 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Register</title>
+    <title>Register - HobbyHosting</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Register</h1>
-    <form id="register-form">
-      <label>
-        Username:
-        <input type="text" id="username" required /> </label
-      ><br />
-      <label>
-        Email:
-        <input type="email" id="email" required /> </label
-      ><br />
-      <label>
-        Password:
-        <input type="password" id="password" required /> </label
-      ><br />
-      <label>
-        <input type="checkbox" id="auto-login" /> Log in after registration </label
-      ><br />
-      <button type="submit">Register</button>
-    </form>
-    <p id="message"></p>
+    <header>
+      <h1>HobbyHosting</h1>
+    </header>
+    <main class="container">
+      <h2>Register</h2>
+      <form id="register-form">
+        <label
+          >Username:<br /><input type="text" id="username" required
+        /></label>
+        <label>Email:<br /><input type="email" id="email" required /></label>
+        <label
+          >Password:<br /><input type="password" id="password" required
+        /></label>
+        <label
+          ><input type="checkbox" id="auto-login" /> Log in after
+          registration</label
+        >
+        <button type="submit">Register</button>
+      </form>
+      <p id="message"></p>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </main>
     <script src="register.js"></script>
   </body>
 </html>

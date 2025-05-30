@@ -10,7 +10,7 @@ Ett modernt DevOps-baserat plattformsprojekt byggt med microservices, Docker, Fa
 hobbyhosting/
 ├── apps/                  # Fristående frontends
 │   ├── public_site/       # Enkel statisk sida
-│   ├── admin_panel/       # Minimal adminpanel
+│   ├── admin_panel/       # Statisk adminpanel med användarhantering
 │   └── hobbyhosting-frontend/  # Legacy Next.js-projekt (tomt)
 ├── packages/
 │   └── ui/                # Återanvändbara React-komponenter
@@ -96,7 +96,8 @@ design.
 Frontend-apparna ligger under `apps/` och består av rena statiska filer:
 
 - `public_site/` – enkel publiksida
-- `admin_panel/` – lättviktigt admin-gränssnitt
+- `admin_panel/` – statisk sida med användarlista och knappar för att
+  promota/demota admins
 
 Starta dem genom att öppna `index.html` direkt eller kör en simpel HTTP-server:
 

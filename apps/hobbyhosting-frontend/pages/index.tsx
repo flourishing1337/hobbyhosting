@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import '../styles/globals.css';
+import Link from "next/link";
+import "../styles/globals.css";
 
 export default function Home() {
   return (
@@ -11,8 +11,12 @@ export default function Home() {
         <h2>Welcome to HobbyHosting</h2>
         <p>Your home for simple app hosting.</p>
         <nav>
-          <Link href="/login"><button>Login</button></Link>
-          <Link href="/register"><button>Register</button></Link>
+          <Link href="/login">
+            <button>Login</button>
+          </Link>
+          <Link href="/register">
+            <button>Register</button>
+          </Link>
         </nav>
       </main>
     </div>

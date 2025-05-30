@@ -1,12 +1,11 @@
 import Link from "next/link";
+import Header from "../components/Header";
 import "../styles/globals.css";
 
 export default function Showcase() {
   return (
     <div>
-      <header>
-        <h1>HobbyHosting</h1>
-      </header>
+      <Header />
       <main className="container">
         <h2>Our Work</h2>
         <p>Check out some of our previous films below.</p>

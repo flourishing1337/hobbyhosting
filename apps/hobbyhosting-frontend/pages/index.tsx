@@ -20,6 +20,9 @@ export default function Home() {
           <Link href="/showcase">
             <button>Showcase</button>
           </Link>
+          <Link href="/film">
+            <button>Film your business</button>
+          </Link>
         </nav>
       </main>
     </div>
